@@ -3,22 +3,18 @@ package bloomfilter
 import (
 	"context"
 	"fmt"
-
 	"github.com/go-redis/redis/v8"
 )
 
 type redisBloomFilter struct {
-	client       *redis.Client
+	client       *redis.ClusterClient
 	key          string
 	bucketCount  uint64
 	bucketMaxLen uint64
 	hashFuncs    []func([]byte) uint64
 }
 
-func NewRedisBloomFilter(redisCli *redis.Client, redisKey string, size uint64) BloomFilter {
-	if redisKey == "" {
-		redisKey = fmt.Sprintf("_bloomfilter_%d", size)
-	}
+func NewRedisClusterBloomFilter(redisCli *redis.ClusterClient, redisKey string, size uint64) BloomFilter {
 	var bucketMaxLen uint64 = 1000000
 	bucketCount := size / bucketMaxLen
 	if size%bucketMaxLen > 0 {
